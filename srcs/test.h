@@ -5,11 +5,17 @@
 # include <unistd.h>
 # include <stdlib.h>
 
+// fonctions
 size_t	ft_strlen(const char *str);
 char	*ft_strdup(char *str);
 int		ft_strncmp(const char *s1, const char *s2, size_t n);
+int	  ft_toupper(int c);
+char	*ft_substr(char const *s, unsigned int start, size_t len);
+
 // built-in
-void	ft_echo(char *str, int option_n);
+void	ft_echo_all(char **tab);
+int	  ft_echo_option_n(char *str);
+// void	ft_echo(char *str);
 void	ft_env(char **env);
 int		ft_export_all(char **tab, char ***env);
 int		ft_check_env_egal(char *str);

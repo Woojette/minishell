@@ -1,8 +1,42 @@
 #include "test.h"
 
-void	ft_echo(char *str, int option_n)
+int	ft_echo_option_n(char *str)
 {
-	printf("%s", str);
+	int	i;
+
+	if (!str)
+		return (0);
+	if (str[0] != '-')
+		return (0);
+	i = 1;
+	while (str[i] != '\0')
+	{
+		if (str[i] == 'n')
+			i++;
+		else
+			return (0);
+	}
+	return (1);
+}
+
+void	ft_echo_all(char **tab)
+{
+	int	j;
+	int	option_n;
+
+	j = 1;
+	option_n = 0;
+	while (tab[j] != NULL && ft_echo_option_n(tab[j]) == 1)
+		j++;
+	if (j > 1)
+		option_n = 1;
+	while (tab[j] != NULL)
+	{
+		printf("%s", tab[j]);
+		if (tab[j + 1] != NULL)
+			printf(" ");
+		j++;
+	}
 	if (option_n == 0)
 		printf("\n");
 }
@@ -41,10 +75,10 @@ int	ft_compter_env(char **env)
 int	ft_check_env_egal(char *str)
 {
 	int		i;
-	int		j;
+	// int		j;
 
 	i = 0;
-	j = 0;
+	// j = 0;
 	while (str[i] != '\0')
 	{
 		if (str[i] == '=')
@@ -58,11 +92,11 @@ int	ft_check_env_egal(char *str)
 
 int	ft_check_env_double(char *str, char **env)
 {
-	int	i;
+	// int	i;
 	int	j;
 	int	egal;
 
-	i = 0;
+	// i = 0;
 	j = 0;
 	egal = ft_check_env_egal(str);
 	if (egal == -1)
@@ -108,10 +142,10 @@ int	ft_export_sans_double(char *str, char ***env)
 {
 	int		j;
 	int		taille;
-	int		check;
+	// int		check;
 	char	**env_ajoute;
 
-	check = ft_check_env_double(str, (*env));
+	// check = ft_check_env_double(str, (*env));
 	j = 0;
 	taille = 0;
 	while ((*env)[taille] != NULL)
@@ -133,13 +167,13 @@ int	ft_export_sans_double(char *str, char ***env)
 
 int	ft_export(char *str, char ***env)
 {
-	int		j;
-	int		taille;
+	// int		j;
+	// int		taille;
 	int		check;
 	// char	**env_ajoute;
 
-	j = 0;
-	taille = 0;
+	// j = 0;
+	// taille = 0;
 	check = ft_check_env_double(str, (*env));
 	if (check != 0)
 	{
@@ -224,6 +258,8 @@ int	ft_pwd(void)
 		printf("%s\n", buf);
 		return (0);
 	}
+	else
+		perror("getcwd");
 	return (-1);
 }
 
@@ -233,8 +269,18 @@ int	main(int ac, char **av, char **env)
 	(void)ac;
 	(void)av;
 	(void)env;
-	// //Test echo
-	// printf("#####Test echo#####\n");
+	// // //Test echo
+	// // printf("#####Test echo#####\n");
+	// char	*tab[8];
+	// tab[0] = "echo";
+	// tab[1] = "--nnn";
+	// tab[2] = "-n";
+	// tab[3] = "-nnann";
+	// tab[4] = "coucou";
+	// tab[5] = "-n";
+	// tab[6] = "hihi";
+	// tab[7] = NULL;
+	// ft_echo_all(tab);
 	// ft_echo(av[1], 0);
 	// ft_echo(av[1], 1);
 	// printf("#####Fin de test echo#####");
@@ -265,30 +311,30 @@ int	main(int ac, char **av, char **env)
 
 	// ft_export("new=salut", &env);
 
-	// Test unset
-	printf("\n########unset#######\n");
-	// ft_env(env);
-	char	*tab2[5];
-	tab2[0] = "unset";
-	tab2[1] = "coucou";
-	tab2[2] = "coucou123";
-	tab2[3] = "coucou";
-	tab2[4] = NULL;
-	// ft_unset(tab2[1], &env);
-	// ft_unset(tab2[2], &env);
-	ft_unset_all(tab2, &env);
+	// // Test unset
+	// printf("\n########unset#######\n");
+	// // ft_env(env);
+	// char	*tab2[5];
+	// tab2[0] = "unset";
+	// tab2[1] = "coucou";
+	// tab2[2] = "coucou123";
+	// tab2[3] = "coucou";
+	// tab2[4] = NULL;
+	// // ft_unset(tab2[1], &env);
+	// // ft_unset(tab2[2], &env);
+	// ft_unset_all(tab2, &env);
 
-	ft_env(env);
-
-	ft_export("new123=salut", &env);
-	ft_unset("new123", &env);
-	ft_unset("_", &env);
 	// ft_env(env);
-	printf("\n%d", ft_check_env_double("MAIL", env));
-	ft_env(env);
+
+	// ft_export("new123=salut", &env);
+	// ft_unset("new123", &env);
+	// ft_unset("_", &env);
+	// // ft_env(env);
+	// printf("\n%d", ft_check_env_double("MAIL", env));
+	// ft_env(env);
 
 	// Test pwd
-	// ft_pwd();
+	ft_pwd();
 
 	// // Test cd
 	// printf("#####Test cd#####");

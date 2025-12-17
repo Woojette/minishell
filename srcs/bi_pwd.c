@@ -11,5 +11,7 @@ int	ft_pwd(void)
 		printf("%s\n", buf);
 		return (0);
 	}
+	else
+		perror("getcwd");
 	return (-1);
 }
