@@ -44,11 +44,6 @@ typedef struct s_parse
 	struct s_parse	*next;
 }	t_parse;
 
-
-
-
-
-
 // typedef struct minis
 // {
 // 	char	**res;
@@ -56,5 +51,18 @@ typedef struct s_parse
 // 	char	**env;
 // 	int		exit_status;
 // }	t_minis;
+
+void	ft_echo(char *str, int option_n);
+void	ft_env(char **env);
+int		ft_export_all(char **tab, char ***env);
+int		ft_check_env_egal(char *str);
+int		ft_check_env_double(char *str, char **env);
+int		ft_export_sans_double(char *str, char ***env);
+int		ft_export_double(char *str, char ***env);
+int		ft_export(char *str, char ***env);
+int		ft_unset_all(char **tab, char ***env);
+int		ft_unset(char *str, char ***env);
+void	ft_unset_init_int_zero(int *j, int *supprime, int *taille);
+int		ft_pwd(void);
 
 #endif

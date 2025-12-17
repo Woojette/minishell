@@ -104,21 +104,16 @@ int	ft_export_double(char *str, char ***env)
 	return (0);
 }
 
-int	ft_export(char *str, char ***env)
+int	ft_export_sans_double(char *str, char ***env)
 {
 	int		j;
 	int		taille;
 	int		check;
 	char	**env_ajoute;
 
+	check = ft_check_env_double(str, (*env));
 	j = 0;
 	taille = 0;
-	check = ft_check_env_double(str, (*env));
-	if (check != 0)
-	{
-		ft_export_double(str, env);
-		return (0);
-	}
 	while ((*env)[taille] != NULL)
 		taille++;
 	env_ajoute = malloc(sizeof(char *) * (taille + 1 + 1));
@@ -136,6 +131,25 @@ int	ft_export(char *str, char ***env)
 	return (0);
 }
 
+int	ft_export(char *str, char ***env)
+{
+	int		j;
+	int		taille;
+	int		check;
+	// char	**env_ajoute;
+
+	j = 0;
+	taille = 0;
+	check = ft_check_env_double(str, (*env));
+	if (check != 0)
+	{
+		ft_export_double(str, env);
+		return (0);
+	}
+	ft_export_sans_double(str, env);
+	return (0);
+}
+
 int	ft_export_all(char **tab, char ***env)
 {
 	int	j;
@@ -149,6 +163,13 @@ int	ft_export_all(char **tab, char ***env)
 	return (0);
 }
 
+void	ft_unset_init_int_zero(int *j, int *supprime, int *taille)
+{
+	*j = 0;
+	*supprime = 0;
+	*taille = 0;
+}
+
 int	ft_unset(char *str, char ***env)
 {
 	int		j;
@@ -157,9 +178,7 @@ int	ft_unset(char *str, char ***env)
 	int		len_str;
 	char	**env_supprime;
 
-	j = 0;
-	supprime = 0;
-	taille = 0;
+	ft_unset_init_int_zero(&j, &supprime, &taille);
 	while ((*env)[taille] != NULL)
 		taille++;
 	len_str = ft_strlen(str);
@@ -177,8 +196,8 @@ int	ft_unset(char *str, char ***env)
 		j++; 
 	}
 	env_supprime[j] = NULL;
-	(*env) = env_supprime;
-	return (0);
+	// (*env) = env_supprime;
+	return ((*env) = env_supprime, 0);
 }
 
 int	ft_unset_all(char **tab, char ***env)
@@ -244,31 +263,32 @@ int	main(int ac, char **av, char **env)
 	// printf("\n%d", ft_check_env_double("coucou123=salut", env));
 	// printf("\n%d", ft_check_env_double("coucou", env));
 
-	// // ft_export("new=salut", &env);
+	// ft_export("new=salut", &env);
 
-	// printf("\n########unset#######\n");
-
-	// char	*tab2[5];
-	// tab2[0] = "unset";
-	// tab2[1] = "coucou";
-	// tab2[2] = "coucou123";
-	// tab2[3] = "coucou";
-	// tab2[4] = NULL;
-	// // ft_unset(tab2[1], &env);
-	// // ft_unset(tab2[2], &env);
-	// ft_unset_all(tab2, &env);
-
+	// Test unset
+	printf("\n########unset#######\n");
 	// ft_env(env);
+	char	*tab2[5];
+	tab2[0] = "unset";
+	tab2[1] = "coucou";
+	tab2[2] = "coucou123";
+	tab2[3] = "coucou";
+	tab2[4] = NULL;
+	// ft_unset(tab2[1], &env);
+	// ft_unset(tab2[2], &env);
+	ft_unset_all(tab2, &env);
 
-	// ft_export("new123=salut", &env);
-	// ft_unset("new123", &env);
-	// // ft_unset("_", &env);
-	// // // ft_env(env);
-	// // printf("\n%d", ft_check_env_double("MAIL", env));
+	ft_env(env);
+
+	ft_export("new123=salut", &env);
+	ft_unset("new123", &env);
+	ft_unset("_", &env);
 	// ft_env(env);
+	printf("\n%d", ft_check_env_double("MAIL", env));
+	ft_env(env);
 
 	// Test pwd
-	ft_pwd();
+	// ft_pwd();
 
 	// // Test cd
 	// printf("#####Test cd#####");
