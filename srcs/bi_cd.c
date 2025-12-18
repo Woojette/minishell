@@ -1,36 +1,180 @@
 #include "minishell.h"
 
-void ft_cd_home_sans_av(char **home, char ***env)
+char *ft_cd_val_env(char *str, char ***env)
 {
   int   j;
-  char  *home;
+  char	*str_path;
 
   j = 0;
-  home = "HOME=";
   while ((*env)[j] != NULL)
   {
-    if (ft_strncmp((*env)[j], home, ft_strlen(home)) == 0)
-      *home = ft_strdup((*env)[j] + ft_strlen(home));
+    if (ft_strncmp((*env)[j], str, ft_strlen(str)) == 0)
+	{
+		str_path = ft_strdup((*env)[j] + ft_strlen(str));
+		if (!str_path)
+			return (NULL);
+		return (str_path);
+	}
     j++;
   }
+  return (NULL);
 }
 
-int ft_cd(char *str, char ***env)
+int	ft_cd_sans_av(char **val, char **path, char *str, char ***env)
 {
-  char  *oldpwd;
-  char  *pwd;
-  char  *home;
-  char  *path;
+	// char	*home;
+	// char	*oldpwd;
 
-  if (str == NULL)
-  {
-    ft_cd_home_sans_av(&home, env);
-    if (home == NULL)
+	// home = "HOME=";
+	// oldpwd = "OLDPWD=";
+    (*val) = ft_cd_val_env(str, env);
+	if (!(*val))
+	{
+		if (ft_strncmp(str, "HOME=", 5) == 0)
+			printf("minishell: cd: HOME not set\n");
+		else if (ft_strncmp(str, "OLDPWD=", 7) == 0)
+			printf("minishell: cd: OLDPWD not set\n");
+		return (-1);
+	}
+    // if (((*val) == NULL) && (ft_strncmp((*val), home, 5) == 0))
+    // {
+    //   printf("minishell: cd: HOME not set\n");
+    //   return (-1);
+    // }
+    // else if (((*val) == NULL) && (ft_strncmp((*val), oldpwd, 7) == 0))
+    // {
+    //   printf("minishell: cd: OLDPWD not set\n");
+    //   return (-1);
+    // }
+    (*path) = (*val);
+	if (chdir((*path)) == -1)
+	{
+		perror ("chdir");
+		return (-1);
+	}
+	return (0);
+}
+
+int	ft_cd_tiret(char **oldpwd, char **path, char ***env)
+{
+	char	*new_oldpwd;
+	char	*new_pwd;
+
+	(*oldpwd) = ft_cd_val_env("OLDPWD=", env);
+	if ((*oldpwd) == NULL)
     {
-      printf("minishell: cd: HOME not set\n");
+      printf("minishell: cd: OLDPWD not set\n");
       return (-1);
     }
-    path = home;
-  }
-  
+	(*path) = (*oldpwd);
+	// if (access(*path, F_OK) != 0)
+	// 	perror("access F_OK");
+	// if (access(*path, X_OK)  != 0)
+	// 	perror("access X_OK");
+	new_oldpwd = getcwd(NULL, 0);
+	if (chdir((*path)) == -1)
+	{
+		printf("cd: %s", (*path));
+		printf(": No such file or directory\n");
+		return (-1);
+	}
+	new_pwd = getcwd(NULL, 0);
+	ft_cd_env_update(&new_oldpwd, &new_pwd, env);
+	printf("%s\n", (*path));
+	return (0);
+}
+
+// void	ft_cd_env_val_vide(int j, char *str, char ***env)
+// {
+// 	int	i;
+// 	int	len;
+
+// 	i = ft_strlen(str);
+// 	len = ft_strlen((*env)[j]);
+// 	while (i < len)
+// 	{
+// 		(*env)[j][i] = '\0';
+// 		i++;
+// 	}
+// }
+
+int	ft_cd_env_update(char **oldpwd, char **pwd, char ***env)
+{
+	int		j;
+	char	*temp;
+
+	j = 0;
+	while ((*env)[j] != NULL)
+	{
+		if (ft_strncmp((*env)[j], "OLDPWD=", 7) == 0)
+		{
+			temp = ft_strjoin("OLDPWD=", (*oldpwd));
+			if (!temp)
+				return (-1);
+			free((*env)[j]);
+			(*env)[j] = temp;
+		}
+		else if (ft_strncmp((*env)[j], "PWD=", 4) == 0)
+		{
+			temp = ft_strjoin("PWD=", (*pwd));
+			if (!temp)
+				return (-1);
+			free((*env)[j]);
+			(*env)[j] = temp;
+		}
+		j++;
+	}
+	return (0);
+}
+
+int	ft_cd_all(char **tab, char ***env)
+{
+	int		j;
+	char	*oldpwd;
+	char	*pwd;
+	char	*home;
+	char	*path;
+
+	j = 0;
+	while (tab[j] != NULL)
+		j++;
+	if (j > 3)
+	{
+		printf("cd: too many arguments\n");
+		return (-1);
+	}
+	if (tab[1] == NULL || (tab[1][0] == '~' && tab[1][1] == '\0'))
+	{
+		if (ft_cd_sans_av(&home, &path, "HOME=", env) == -1)
+			return (-1);
+		return (0);
+	}
+	if (tab[2] == NULL)
+	{
+		if (tab[1][0] == '-' && tab[1][1] == '\0')
+		{
+			if (ft_cd_tiret(&oldpwd, &path, env) == -1)
+				return (-1);
+			return (0);
+		}
+		// if (tab[1][0] == '/' && tab[1][1] == '/' && tab[1][3] == '\0')
+		// {
+		// 	if (chdir("//") == -1)
+		// 	{
+		// 		perror ("chdir");
+		// 		return (-1);
+		// 	}
+		// }
+		oldpwd = getcwd(NULL, 0);
+		if (!oldpwd)
+			return (perror("mininshell: cd"), -1);
+		if (chdir(tab[1]) == -1)
+			return (perror ("chdir"), -1);
+		pwd = getcwd(NULL, 0);
+		if (!pwd)
+			return (perror("minishell: cd"), -1);
+		ft_cd_env_update(&oldpwd, &pwd, env);
+		return (0);
+	}
+	return (0);
 }

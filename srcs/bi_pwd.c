@@ -12,6 +12,10 @@ int	ft_pwd(void)
 		return (0);
 	}
 	else
-		perror("getcwd");
+	{
+		printf("pwd: error retrieving current directory: ");
+		printf("getcwd: cannot access parent directories: No such file or directory");
+		printf("\n");
+	}
 	return (-1);
 }
