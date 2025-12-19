@@ -37,20 +37,20 @@ typedef enum s_state
 	GENERAL,
 }	t_state;
 
-typedef struct s_parse
-{
-	char			*val;
-	t_state			state;
-	struct s_parse	*next;
-}	t_parse;
-
-// typedef struct minis
+// typedef struct s_parse
 // {
-// 	char	**res;
-// 	char	*line;
-// 	char	**env;
-// 	int		exit_status;
-// }	t_minis;
+// 	char			*val;
+// 	t_state			state;
+// 	struct s_parse	*next;
+// }	t_parse;
+
+typedef struct minis
+{
+	char	**res;
+	char	*line;
+	char	**env;
+	int		exit_status;
+}	t_minis;
 
 void	ft_echo(char *str, int option_n);
 void	ft_env(char **env);
