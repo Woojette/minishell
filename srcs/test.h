@@ -15,20 +15,25 @@ void	*ft_bzero(void *s, size_t n);
 char	*ft_strjoin(char const *s1, char const *s2);
 
 // builtin
-void	ft_echo_all(char **tab);
+void	ft_echo_all(char **tab);  ////// 
 int	  	ft_echo_option_n(char *str);
-void	ft_env(char **env);
-int		ft_export_all(char **tab, char ***env);
+
+void	ft_env(char **env); /////
+
+int		ft_export_all(char **tab, char ***env); /////
 int		ft_check_env_egal(char *str);
 int		ft_check_env_double(char *str, char **env);
 int		ft_export_sans_double(char *str, char ***env);
 int		ft_export_double(char *str, char ***env);
 int		ft_export(char *str, char ***env);
-int		ft_unset_all(char **tab, char ***env);
+
+int		ft_unset_all(char **tab, char ***env); ////
 int		ft_unset(char *str, char ***env);
 void	ft_unset_init_int_zero(int *j, int *supprime, int *taille);
-int		ft_pwd(void);
-int		ft_cd_all(char **tab, char ***env);
+
+int		ft_pwd(void); ////
+
+int		ft_cd_all(char **tab, char ***env); ////
 char	 *ft_cd_val_env(char *str, char ***env);
 int		ft_cd_sans_av(char **val, char **path, char *str, char ***env);
 int		ft_cd_tiret(char **oldpwd, char **path, char ***env);

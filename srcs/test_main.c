@@ -277,11 +277,9 @@ char *ft_cd_val_env(char *str, char ***env)
 
 int	ft_cd_sans_av(char **val, char **path, char *str, char ***env)
 {
-	// char	*home;
-	// char	*oldpwd;
+	char	*new_oldpwd;
+	char	*new_pwd;
 
-	// home = "HOME=";
-	// oldpwd = "OLDPWD=";
     (*val) = ft_cd_val_env(str, env);
 	if (!(*val))
 	{
@@ -291,22 +289,15 @@ int	ft_cd_sans_av(char **val, char **path, char *str, char ***env)
 			printf("minishell: cd: OLDPWD not set\n");
 		return (-1);
 	}
-    // if (((*val) == NULL) && (ft_strncmp((*val), home, 5) == 0))
-    // {
-    //   printf("minishell: cd: HOME not set\n");
-    //   return (-1);
-    // }
-    // else if (((*val) == NULL) && (ft_strncmp((*val), oldpwd, 7) == 0))
-    // {
-    //   printf("minishell: cd: OLDPWD not set\n");
-    //   return (-1);
-    // }
     (*path) = (*val);
+	new_oldpwd = getcwd(NULL, 0);
 	if (chdir((*path)) == -1)
 	{
 		perror ("chdir");
 		return (-1);
 	}
+	new_pwd = getcwd(NULL, 0);
+	ft_cd_env_update(&new_oldpwd, &new_pwd, env);
 	return (0);
 }
 
@@ -322,10 +313,6 @@ int	ft_cd_tiret(char **oldpwd, char **path, char ***env)
       return (-1);
     }
 	(*path) = (*oldpwd);
-	// if (access(*path, F_OK) != 0)
-	// 	perror("access F_OK");
-	// if (access(*path, X_OK)  != 0)
-	// 	perror("access X_OK");
 	new_oldpwd = getcwd(NULL, 0);
 	if (chdir((*path)) == -1)
 	{
@@ -338,20 +325,6 @@ int	ft_cd_tiret(char **oldpwd, char **path, char ***env)
 	printf("%s\n", (*path));
 	return (0);
 }
-
-// void	ft_cd_env_val_vide(int j, char *str, char ***env)
-// {
-// 	int	i;
-// 	int	len;
-
-// 	i = ft_strlen(str);
-// 	len = ft_strlen((*env)[j]);
-// 	while (i < len)
-// 	{
-// 		(*env)[j][i] = '\0';
-// 		i++;
-// 	}
-// }
 
 int	ft_cd_env_update(char **oldpwd, char **pwd, char ***env)
 {
@@ -366,7 +339,6 @@ int	ft_cd_env_update(char **oldpwd, char **pwd, char ***env)
 			temp = ft_strjoin("OLDPWD=", (*oldpwd));
 			if (!temp)
 				return (-1);
-			free((*env)[j]);
 			(*env)[j] = temp;
 		}
 		else if (ft_strncmp((*env)[j], "PWD=", 4) == 0)
@@ -374,7 +346,6 @@ int	ft_cd_env_update(char **oldpwd, char **pwd, char ***env)
 			temp = ft_strjoin("PWD=", (*pwd));
 			if (!temp)
 				return (-1);
-			free((*env)[j]);
 			(*env)[j] = temp;
 		}
 		j++;
@@ -384,16 +355,12 @@ int	ft_cd_env_update(char **oldpwd, char **pwd, char ***env)
 
 int	ft_cd_all(char **tab, char ***env)
 {
-	int		j;
 	char	*oldpwd;
 	char	*pwd;
 	char	*home;
 	char	*path;
 
-	j = 0;
-	while (tab[j] != NULL)
-		j++;
-	if (j > 3)
+	if ((tab[1] != NULL) && (tab[2] != NULL))
 	{
 		printf("cd: too many arguments\n");
 		return (-1);
@@ -412,14 +379,6 @@ int	ft_cd_all(char **tab, char ***env)
 				return (-1);
 			return (0);
 		}
-		// if (tab[1][0] == '/' && tab[1][1] == '/' && tab[1][3] == '\0')
-		// {
-		// 	if (chdir("//") == -1)
-		// 	{
-		// 		perror ("chdir");
-		// 		return (-1);
-		// 	}
-		// }
 		oldpwd = getcwd(NULL, 0);
 		if (!oldpwd)
 			return (perror("mininshell: cd"), -1);
@@ -434,15 +393,16 @@ int	ft_cd_all(char **tab, char ***env)
 	return (0);
 }
 
+
 int	main(int ac, char **av, char **env) 
 {
 
 	(void)ac;
 	(void)av;
 	(void)env;
-	// // //Test echo
-	// // printf("#####Test echo#####\n");
-	// char	*tab[8];
+	// //Test echo
+	// printf("#####Test echo#####\n");
+	// char	*tab[2];
 	// tab[0] = "echo";
 	// tab[1] = "--nnn";
 	// tab[2] = "-n";
@@ -450,7 +410,7 @@ int	main(int ac, char **av, char **env)
 	// tab[4] = "coucou";
 	// tab[5] = "-n";
 	// tab[6] = "hihi";
-	// tab[7] = NULL;
+	// tab[1] = NULL;
 	// ft_echo_all(tab);
 	// ft_echo(av[1], 0);
 	// ft_echo(av[1], 1);
@@ -520,15 +480,21 @@ int	main(int ac, char **av, char **env)
 	// tab3[3] = "pho";
 	// tab3[4] = NULL;
 	// ft_cd_all(tab3, &env);
+
+	printf("########################################################################\n");
 	printf("avant: ");
 	ft_pwd();
+	ft_env(env);
 
 	// cd -
 	char *tab4[3];
 	tab4[0] = "cd";
-	tab4[1] ="..";
+	tab4[1] ="/no/such/path";
 	tab4[2] = NULL;
+	// tab4[3] = NULL;
+	printf("\n\n\n############# cd effectue ################\n");
 	ft_cd_all(tab4, &env);
+	printf("\n\n\n########################################################################\n\n");
 	printf("apres: ");
 	ft_pwd();
 	ft_env(env);

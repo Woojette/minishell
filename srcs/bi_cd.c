@@ -22,11 +22,9 @@ char *ft_cd_val_env(char *str, char ***env)
 
 int	ft_cd_sans_av(char **val, char **path, char *str, char ***env)
 {
-	// char	*home;
-	// char	*oldpwd;
+	char	*new_oldpwd;
+	char	*new_pwd;
 
-	// home = "HOME=";
-	// oldpwd = "OLDPWD=";
     (*val) = ft_cd_val_env(str, env);
 	if (!(*val))
 	{
@@ -36,22 +34,15 @@ int	ft_cd_sans_av(char **val, char **path, char *str, char ***env)
 			printf("minishell: cd: OLDPWD not set\n");
 		return (-1);
 	}
-    // if (((*val) == NULL) && (ft_strncmp((*val), home, 5) == 0))
-    // {
-    //   printf("minishell: cd: HOME not set\n");
-    //   return (-1);
-    // }
-    // else if (((*val) == NULL) && (ft_strncmp((*val), oldpwd, 7) == 0))
-    // {
-    //   printf("minishell: cd: OLDPWD not set\n");
-    //   return (-1);
-    // }
     (*path) = (*val);
+	new_oldpwd = getcwd(NULL, 0);
 	if (chdir((*path)) == -1)
 	{
 		perror ("chdir");
 		return (-1);
 	}
+	new_pwd = getcwd(NULL, 0);
+	ft_cd_env_update(&new_oldpwd, &new_pwd, env);
 	return (0);
 }
 
@@ -111,7 +102,6 @@ int	ft_cd_env_update(char **oldpwd, char **pwd, char ***env)
 			temp = ft_strjoin("OLDPWD=", (*oldpwd));
 			if (!temp)
 				return (-1);
-			free((*env)[j]);
 			(*env)[j] = temp;
 		}
 		else if (ft_strncmp((*env)[j], "PWD=", 4) == 0)
@@ -119,7 +109,6 @@ int	ft_cd_env_update(char **oldpwd, char **pwd, char ***env)
 			temp = ft_strjoin("PWD=", (*pwd));
 			if (!temp)
 				return (-1);
-			free((*env)[j]);
 			(*env)[j] = temp;
 		}
 		j++;
@@ -129,16 +118,16 @@ int	ft_cd_env_update(char **oldpwd, char **pwd, char ***env)
 
 int	ft_cd_all(char **tab, char ***env)
 {
-	int		j;
+	// int		j;
 	char	*oldpwd;
 	char	*pwd;
 	char	*home;
 	char	*path;
 
-	j = 0;
-	while (tab[j] != NULL)
-		j++;
-	if (j > 3)
+	// j = 0;
+	// while (tab[j] != NULL)
+	// 	j++;
+	if ((tab[1] != NULL) && (tab[2] != NULL))
 	{
 		printf("cd: too many arguments\n");
 		return (-1);
@@ -157,19 +146,15 @@ int	ft_cd_all(char **tab, char ***env)
 				return (-1);
 			return (0);
 		}
-		// if (tab[1][0] == '/' && tab[1][1] == '/' && tab[1][3] == '\0')
-		// {
-		// 	if (chdir("//") == -1)
-		// 	{
-		// 		perror ("chdir");
-		// 		return (-1);
-		// 	}
-		// }
+
 		oldpwd = getcwd(NULL, 0);
 		if (!oldpwd)
 			return (perror("mininshell: cd"), -1);
 		if (chdir(tab[1]) == -1)
+		{
+			// printf("cd: %s: ", tab[1]);
 			return (perror ("chdir"), -1);
+		}
 		pwd = getcwd(NULL, 0);
 		if (!pwd)
 			return (perror("minishell: cd"), -1);
