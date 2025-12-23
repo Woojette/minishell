@@ -29,10 +29,15 @@ int	ft_unset(char *str, char ***env)
 			&& (*env)[j + supprime][len_str] == '=')
 			supprime++;
 		if ((j + supprime) < taille)
+		{
 			env_supprime[j] = ft_strdup((*env)[j + supprime]);
+			if (!env_supprime[j])
+				return (ft_free_tab(env_supprime), -1);
+		}
 		j++; 
 	}
 	env_supprime[j] = NULL;
+	ft_free_tab((*env));
 	(*env) = env_supprime;
 	return (0);
 }
@@ -44,7 +49,8 @@ int	ft_unset_all(char **tab, char ***env)
 	j = 1;
 	while (tab[j] != NULL)
 	{
-		ft_unset(tab[j], env);
+		if (ft_unset(tab[j], env) == -1)
+			return (-1);
 		j++;
 	}
 	return (0);

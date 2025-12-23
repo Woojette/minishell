@@ -42,35 +42,33 @@ int	ft_cd_sans_av(char **val, char **path, char *str, char ***env)
 		return (-1);
 	}
 	new_pwd = getcwd(NULL, 0);
-	ft_cd_env_update(&new_oldpwd, &new_pwd, env);
+	ft_cd_env_update(new_oldpwd, new_pwd, env);
 	return (0);
 }
 
-int	ft_cd_tiret(char **oldpwd, char **path, char ***env)
+int	ft_cd_tiret(char *oldpwd, char **path, char ***env)
 {
-	char	*new_oldpwd;
-	char	*new_pwd;
+	char	new_oldpwd[1024];
+	char	new_pwd[1024];
 
-	(*oldpwd) = ft_cd_val_env("OLDPWD=", env);
-	if ((*oldpwd) == NULL)
+	oldpwd = ft_cd_val_env("OLDPWD=", env);
+	if ((oldpwd) == NULL)
     {
       printf("minishell: cd: OLDPWD not set\n");
       return (-1);
     }
-	(*path) = (*oldpwd);
-	// if (access(*path, F_OK) != 0)
-	// 	perror("access F_OK");
-	// if (access(*path, X_OK)  != 0)
-	// 	perror("access X_OK");
-	new_oldpwd = getcwd(NULL, 0);
+	(*path) = (oldpwd);
+	if (getcwd(new_oldpwd, sizeof(new_oldpwd)) == NULL)
+		return (perror("minishell: cd"), -1);
 	if (chdir((*path)) == -1)
 	{
 		printf("cd: %s", (*path));
 		printf(": No such file or directory\n");
 		return (-1);
 	}
-	new_pwd = getcwd(NULL, 0);
-	ft_cd_env_update(&new_oldpwd, &new_pwd, env);
+	if (getcwd(new_pwd, sizeof(new_pwd)) == NULL)
+		return (perror("minishell: cd"), -1);
+	ft_cd_env_update(new_oldpwd, new_pwd, env);
 	printf("%s\n", (*path));
 	return (0);
 }
@@ -89,7 +87,7 @@ int	ft_cd_tiret(char **oldpwd, char **path, char ***env)
 // 	}
 // }
 
-int	ft_cd_env_update(char **oldpwd, char **pwd, char ***env)
+int	ft_cd_env_update(char *oldpwd, char *pwd, char ***env)
 {
 	int		j;
 	char	*temp;
@@ -99,16 +97,18 @@ int	ft_cd_env_update(char **oldpwd, char **pwd, char ***env)
 	{
 		if (ft_strncmp((*env)[j], "OLDPWD=", 7) == 0)
 		{
-			temp = ft_strjoin("OLDPWD=", (*oldpwd));
+			temp = ft_strjoin("OLDPWD=", oldpwd);
 			if (!temp)
 				return (-1);
+			free ((*env)[j]);
 			(*env)[j] = temp;
 		}
 		else if (ft_strncmp((*env)[j], "PWD=", 4) == 0)
 		{
-			temp = ft_strjoin("PWD=", (*pwd));
+			temp = ft_strjoin("PWD=", pwd);
 			if (!temp)
 				return (-1);
+			free ((*env)[j]);
 			(*env)[j] = temp;
 		}
 		j++;
@@ -118,15 +118,11 @@ int	ft_cd_env_update(char **oldpwd, char **pwd, char ***env)
 
 int	ft_cd_all(char **tab, char ***env)
 {
-	// int		j;
-	char	*oldpwd;
-	char	*pwd;
+	char 	oldpwd[1024];
+	char	pwd[1024];
 	char	*home;
 	char	*path;
 
-	// j = 0;
-	// while (tab[j] != NULL)
-	// 	j++;
 	if ((tab[1] != NULL) && (tab[2] != NULL))
 	{
 		printf("cd: too many arguments\n");
@@ -142,23 +138,17 @@ int	ft_cd_all(char **tab, char ***env)
 	{
 		if (tab[1][0] == '-' && tab[1][1] == '\0')
 		{
-			if (ft_cd_tiret(&oldpwd, &path, env) == -1)
+			if (ft_cd_tiret(oldpwd, &path, env) == -1)
 				return (-1);
 			return (0);
 		}
-
-		oldpwd = getcwd(NULL, 0);
-		if (!oldpwd)
-			return (perror("mininshell: cd"), -1);
-		if (chdir(tab[1]) == -1)
-		{
-			// printf("cd: %s: ", tab[1]);
-			return (perror ("chdir"), -1);
-		}
-		pwd = getcwd(NULL, 0);
-		if (!pwd)
+		if (getcwd(oldpwd, sizeof(oldpwd)) == NULL)
 			return (perror("minishell: cd"), -1);
-		ft_cd_env_update(&oldpwd, &pwd, env);
+		if (chdir(tab[1]) == -1)
+			return (perror("chdir"), -1);
+		if (getcwd(pwd, sizeof(pwd)) == NULL)
+			return (perror("minishell: cd"), -1);
+		ft_cd_env_update(oldpwd, pwd, env);
 		return (0);
 	}
 	return (0);

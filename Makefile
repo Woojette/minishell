@@ -9,7 +9,19 @@ OBJ_DIR     = objs
 
 NAME = minishell
 
-SRCS = $(SRC_DIR)/main.c \
+SRCS = $(SRC_DIR)/test_main.c \
+		$(SRC_DIR)/test_fonction.c \
+		$(SRC_DIR)/ft_init.c \
+		$(SRC_DIR)/bi_cd.c \
+		$(SRC_DIR)/bi_echo.c \
+		$(SRC_DIR)/bi_env.c \
+		$(SRC_DIR)/bi_exit.c \
+		$(SRC_DIR)/bi_exit_ft.c \
+		$(SRC_DIR)/bi_export.c \
+		$(SRC_DIR)/bi_pwd.c \
+		$(SRC_DIR)/bi_unset.c \
+		$(SRC_DIR)/bi_free.c \
+
 
 OBJS = $(SRCS:$(SRC_DIR)/%.c=$(OBJ_DIR)/%.o)
 
