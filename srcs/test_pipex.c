@@ -17,9 +17,9 @@ int	main(int ac, char **av)
 	char	buff[5000];
 	int		n;
 
-	id = fork();
 	if (pipe(pipefd) == -1)
 		return (perror("pipe"), 1);
+	id = fork();
 	if (id == 0)
 	{
 		if (dup2(pipefd[1], 1) == -1)
@@ -28,9 +28,9 @@ int	main(int ac, char **av)
 		close(pipefd[1]);
 	}
 	close(pipefd[0]);
-	id2 = fork();
 	if (pipe(pipefd_2) == -1)
 		return (perror("pipe"), 1);
+	id2 = fork();
 	if (id2 == 0)
 	{
 		if (dup2(pipefd_2[0], 0) == -1)
