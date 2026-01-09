@@ -6,7 +6,7 @@
 # include <stdlib.h>
 # include <limits.h>
 
-typedef struct minis
+typedef struct s_minis
 {
 	char	**res;
 	char	*line;

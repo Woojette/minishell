@@ -19,16 +19,6 @@ int	main(int ac, char **av, char **env)
 			break;
 		i = 0;
 		// if (mini->parse->state == DQUOTES)
-		while (line[i] != '\0')
-		{
-			while (line[i] != '|' && line[i] != '\0')
-			{
-				if (line[i] == '>' || line[i] == '<')
-				{
-					
-				}
-			}
-		}
 	}
 	return (0);
 }
