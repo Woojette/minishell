@@ -5,6 +5,7 @@
 # include <unistd.h>
 # include <stdlib.h>
 # include <limits.h>
+# include <sys/wait.h>
 
 typedef struct s_minis
 {
