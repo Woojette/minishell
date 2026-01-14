@@ -1,13 +1,82 @@
 #ifndef MINISHELL_H
 # define MINISHELL_H
 
-# include <stdio.h>
-# include <unistd.h>
-# include <stdlib.h>
+# include <curses.h>
+# include <dirent.h>
+# include <fcntl.h>
 # include <limits.h>
+# include <readline/history.h>
+# include <readline/readline.h>
+# include <signal.h>
+# include <stdio.h>
+# include <stdlib.h>
+# include <string.h>
+# include <sys/ioctl.h>
+# include <sys/stat.h>
 # include <sys/wait.h>
+# include <term.h>
+# include <termcap.h>
+# include <termios.h>
+# include <unistd.h>
 
-typedef struct s_minis
+typedef enum s_state
+{
+	DQUOTES,
+	SQUOTES,
+	GENERAL,
+}	t_state;
+
+typedef enum s_type_token
+{
+	T_MOT,
+	T_PIPE,
+	T_RD_IN,
+	T_RD_OUT,
+	T_RD_APPEND,
+	T_RD_HEREDOC,
+}	t_type_token;
+
+typedef enum s_type_bi
+{
+	T_ECHO,
+	T_CD,
+	T_PWD,
+	T_EXPORT,
+	T_UNSET,
+	T_ENV,
+	T_EXIT,
+}	t_type_bi;
+
+typedef struct s_token
+{
+
+	char			*str; // token = <<
+	t_type_token	type_token; //= T_RD_HEREDOC
+	t_type_bi		type_bi; // type builtin
+	t_state			type_quote; // = GENERAL
+	struct s_token	*next;
+}	t_token;
+
+
+typedef struct s_mini
+{
+	char			*cmd;
+	char			*redir;
+	char			*arg;
+	int				arg_index;
+	int				exit_status;
+	// t_parse			parse;
+	struct s_mini	*next;
+}	t_mini;
+
+// typedef struct s_parse
+// {
+// 	char			*val;
+// 	t_state			state;
+// 	struct s_parse	*next;
+// }	t_parse;
+
+typedef struct minis
 {
 	char	**res;
 	char	*line;
@@ -15,76 +84,17 @@ typedef struct s_minis
 	int		exit_status;
 }	t_minis;
 
-// fonctions
-size_t		ft_strlen(const char *str);
-char		*ft_strdup(char *str);
-int			ft_strncmp(const char *s1, const char *s2, size_t n);
-int		 	ft_toupper(int c);
-char		*ft_substr(char const *s, unsigned int start, size_t len);
-void		*ft_bzero(void *s, size_t n);
-char		*ft_strjoin(char const *s1, char const *s2);
-int			ft_isdigit(int c);
-
-// free
-void	ft_free_tab(char **tab);
-void	ft_lst_clear(t_minis **mini);
-void	ft_free_all(t_minis **mini);
-
-// init
-int			ft_init_mini(char **env, t_minis **mini);
-char		**ft_copie_tab(char ***env);
-
-// builtin
-void		ft_echo_all(char **tab);  ////// 
-int	  		ft_echo_option_n(char *str);
-
-void		ft_env(char **env); /////
-
-int			ft_export_all(char **tab, char ***env); /////
-int			ft_check_env_egal(char *str);
-int			ft_check_env_double(char *str, char **env);
-int			ft_export_sans_double(char *str, char ***env);
-int			ft_export_double(char *str, char ***env);
-int			ft_export(char *str, char ***env);
-
-int			ft_unset_all(char **tab, char ***env); ////
-int			ft_unset(char *str, char ***env);
-void		ft_unset_init_int_zero(int *j, int *supprime, int *taille);
-
-int			ft_pwd(void); ////
-
-int			ft_cd_all(char **tab, char ***env); ////
-char		 *ft_cd_val_env(char *str, char ***env);
-int			ft_cd_sans_av(char **val, char **path, char *str, char ***env);
-int			ft_cd_tiret(char *oldpwd, char **path, char ***env);
-int			ft_cd_env_update(char *oldpwd, char *pwd, char ***env);
-
-int			ft_exit(char **tab, t_minis **mini);
-int			ft_exit_check_not_int(char *str);
-long long	ft_exit_atoi_long(const char *str, int *error);
-void		ft_exit_sans_arg(int *exit_temp, t_minis **mini);
-void		ft_exit_normal_arg(char *str, t_minis **mini);
-void		ft_exit_pl_arg(int *exit_temp, t_minis **mini);
-void		ft_exit_wrong_arg(int *exit_temp, char *str, t_minis **mini);
+// void	ft_echo(char *str, int option_n);
+// void	ft_env(char **env);
+// int		ft_export_all(char **tab, char ***env);
+// int		ft_check_env_egal(char *str);
+// int		ft_check_env_double(char *str, char **env);
+// int		ft_export_sans_double(char *str, char ***env);
+// int		ft_export_double(char *str, char ***env);
+// int		ft_export(char *str, char ***env);
+// int		ft_unset_all(char **tab, char ***env);
+// int		ft_unset(char *str, char ***env);
+// void	ft_unset_init_int_zero(int *j, int *supprime, int *taille);
+// int		ft_pwd(void);
 
 #endif
-
-// power leveling
-// echo "-n" "hola" | cd .. | cat -e
-
-
-
-// echo
-// "hola"
-// |
-// cd
-// ..
-// |
-// cat
-// -e
-
-
-// **tab = "echo" "hola"
-// tab[0] = "echo"
-// tab[1] = "hola"
-// "cd" ".."
